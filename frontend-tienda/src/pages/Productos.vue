@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, watch } from "vue";
+import { ref, onMounted, watch, computed } from "vue";
 import { useProductosStore } from "../stores/useProductos";
 import { useConfirmarStore } from "../stores/useConfirmarStore.js";
 import BaseTable from "../components/BaseTable.vue";
@@ -36,14 +36,29 @@ watch(() => productosStore.textoBusqueda, (nuevoTexto) => {
 
 const columnas = [
     { key: "codigo_barra", label: "Código de barra" },
-    { key: "nombre_producto", label: "Producto" },
+    { key: "nombre_producto", label: "Producto", sortable: true },
     { key: "presentacion", label: "Presentación" },
-    { key: "stock", label: "Stock", align: "right" },
+    { key: "stock", label: "Stock", align: "right", sortable: true },
     { key: "precio_venta", label: "Precio venta", align: "right" },
     { key: "precio_costo", label: "Precio costo", align: "right" },
     { key: "activo", label: "Estado", align: "center" },
     { key: "acciones", label: "", align: "right" },
 ];
+
+const manejarOrden = (columnaKey) => {
+    if (productosStore.sortBy === columnaKey) {
+        productosStore.direction = productosStore.direction === 'asc' ? 'desc' : 'asc';
+    } else {
+        productosStore.sortBy = columnaKey;
+        productosStore.direction = 'asc';
+    }
+    
+    // Recargamos los datos desde la base de datos manteniendo la página actual
+    productosStore.obtenerProductos(productosStore.paginaActual);
+};
+
+
+
 
 const cambiarEstado = async (producto) => {
     const desactivar = producto.activo;
@@ -113,7 +128,9 @@ const irAEditar = (id) => {
             :columns="columnas"
             :rows="productosStore.productos"
             :loading="productosStore.cargando"
-            emptyText="No se encontraron productos registrados."
+            :sort-column="productosStore.sortBy"
+            :sort-direction="productosStore.direction"
+            @sort="manejarOrden"
         >
             <template #cell-stock="{ row, value }">
                 <span

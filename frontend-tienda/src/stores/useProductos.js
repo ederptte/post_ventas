@@ -15,6 +15,8 @@ export const useProductosStore = defineStore('productos', () => {
     const totalPaginas = ref(1);
 
     const erroresValidacion = ref({});
+    const sortBy = ref('stock');
+    const direction = ref('asc');
 
     // Actions
     async function obtenerProductos(pagina = 1) {
@@ -26,6 +28,8 @@ export const useProductosStore = defineStore('productos', () => {
             const params = {
                 page: paginaActual.value,
                 limit: porPagina.value,
+                sort_by: sortBy.value,     // 👈 Enviamos la columna a ordenar
+                direction: direction.value
             };
             if (textoBusqueda.value.trim()) {
                 params.search = textoBusqueda.value.trim();
@@ -144,6 +148,7 @@ export const useProductosStore = defineStore('productos', () => {
         }
     }
 
+
     function limpiarErrores() {
         erroresValidacion.value = {};
         error.value = null;
@@ -159,6 +164,8 @@ export const useProductosStore = defineStore('productos', () => {
         porPagina,
         totalPaginas,
         erroresValidacion,
+        sortBy,
+        direction,
         obtenerProductos,
         buscarProductos,
         crearProducto,

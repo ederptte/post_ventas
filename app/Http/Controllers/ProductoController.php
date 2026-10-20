@@ -47,6 +47,15 @@ class ProductoController extends Controller
     }
     public function index(Request $request)
     {
+        // Validamos que la columna permitida exista, si no, usa 'id' por defecto
+        $sortBy = $request->input('sort_by', 'id');
+        $allowedSorts = ['id', 'nombre_producto', 'stock', 'precio_venta', 'created_at'];
+        if (!in_array($sortBy, $allowedSorts)) {
+            $sortBy = 'id';
+        }
+
+        $direction = $request->input('direction', 'desc') === 'asc' ? 'asc' : 'desc';
+
         $productos = Producto::query()
         ->when($request->search, function ($query, $search) {
             $query->where(function ($q) use ($search) {
@@ -54,16 +63,16 @@ class ProductoController extends Controller
                   ->orWhere('codigo_barra', 'like', "%{$search}%");
             });
         })
-        ->orderByDesc('id')
+        ->orderBy($sortBy, $direction)
         ->paginate(8);
 
         return response()->json([
-            'status'      => 'success',
-            'total_items' => $productos->total(),        // El total real en toda la base de datos
-            'per_page'    => $productos->perPage(),      // Cuántos hay por página (10)
-            'current_page'=> $productos->currentPage(),  // En qué página estás parado
-            'last_page'   => $productos->lastPage(),     // Cuántas páginas hay en total
-            'data'        => $productos->items()         // Extrae únicamente el array de los productos
+            'status'       => 'success',
+            'total_items'  => $productos->total(),       
+            'per_page'     => $productos->perPage(),      
+            'current_page' => $productos->currentPage(),  
+            'last_page'    => $productos->lastPage(),     
+            'data'         => $productos->items()        
         ], 200);
     }
 

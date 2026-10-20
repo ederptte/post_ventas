@@ -7,9 +7,13 @@ defineProps({
   clickable: { type: Boolean, default: false },
   emptyText: { type: String, default: 'No hay registros.' },
   dense: { type: Boolean, default: false },
+  // 👇 Recibimos el estado actual del ordenamiento desde el padre
+  sortColumn: { type: String, default: '' },
+  sortDirection: { type: String, default: 'asc' },
 })
 
-const emit = defineEmits(['row-click'])
+// 👇 Agregamos 'sort' a los eventos emitidos
+const emit = defineEmits(['row-click', 'sort'])
 </script>
 
 <template>
@@ -18,21 +22,31 @@ const emit = defineEmits(['row-click'])
       <thead class="bg-gray-50">
         <tr>
           <th
-          v-for="column in columns"
-          :key="column.key"
-          scope="col"
-          class="px-4 font-medium text-gray-600 whitespace-nowrap"
-          :class="[
-            dense ? 'py-2' : 'py-3',
-            column.align === 'right' ? 'text-right' : column.align === 'center' ? 'text-center' : 'text-left',
-          ]"
-        >
-            {{ column.label }}
+            v-for="column in columns"
+            :key="column.key"
+            scope="col"
+            class="px-4 font-medium text-gray-600 whitespace-nowrap select-none"
+            :class="[
+              dense ? 'py-2' : 'py-3',
+              column.align === 'right' ? 'text-right' : column.align === 'center' ? 'text-center' : 'text-left',
+              column.sortable ? 'cursor-pointer hover:bg-gray-100' : ''
+            ]"
+            @click="column.sortable && emit('sort', column.key)"
+          >
+            <div class="inline-flex items-center gap-1" :class="column.align === 'right' ? 'justify-end w-full' : column.align === 'center' ? 'justify-center w-full' : ''">
+              {{ column.label }}
+              
+              <!-- 👇 Indicador visual de ordenamiento -->
+              <span v-if="column.sortable" class="text-xs text-gray-400">
+                {{ sortColumn === column.key ? (sortDirection === 'asc' ? '▲' : '▼') : '↕' }}
+              </span>
+            </div>
           </th>
         </tr>
       </thead>
 
       <tbody class="divide-y divide-gray-100 bg-white">
+        <!-- (El resto de tu tbody se mantiene exactamente igual...) -->
         <tr v-if="loading">
           <td :colspan="columns.length" class="px-4 py-4 text-center text-gray-500">
             Cargando...
