@@ -6,6 +6,7 @@ import BaseInput from '../components/BaseInput.vue';
 import BaseSelect from '../components/BaseSelect.vue';
 import BaseMoneyInput from '../components/BaseMoneyInput.vue';
 import BaseButton from '../components/BaseButton.vue';
+import { formatearCantidad } from "../utils/formatos.js";
 import { useToast } from '../stores/useToast.js';
 
 const productosStore = useProductosStore();
@@ -33,19 +34,29 @@ onMounted(async () => {
     if (esEdicion.value) {
         const producto = await productosStore.obtenerProductoPorId(idProducto);
         if (producto) {
+            // Determinamos la unidad para saber si debemos redondear el stock
+            const unidadMedida = producto.unidad_medida ?? '';
+            let stockValor = producto.stock ?? '';
+
+            // Si no es kilogramo y hay stock, nos aseguramos de que sea un número entero puro
+            if (unidadMedida !== 'kilogramo' && stockValor !== '') {
+                stockValor = Math.round(Number(stockValor));
+            }
+
             formulario.value = {
                 codigo_barra: producto.codigo_barra ?? '',
                 nombre_producto: producto.nombre_producto ?? '',
                 presentacion: producto.presentacion ?? '',
-                unidad_medida: producto.unidad_medida ?? '',
+                unidad_medida: unidadMedida,
                 precio_costo: producto.precio_costo ?? '',
                 precio_venta: producto.precio_venta ?? '',
                 alerta_bajo_stock: producto.alerta_bajo_stock ?? '',
-                stock: producto.stock ?? '',
+                stock: stockValor, // 👈 Aquí ya entra limpio sin decimales si es pieza
             };
         }
     }
 });
+
 
 const opcionesUnidadMedidas = [
     { value: 'pieza', label: 'Pieza' },
@@ -77,7 +88,7 @@ const manejarGuardado = async () => {
 
 <template>
     <div class="w-full max-w-5xl mx-auto rounded bg-white p-6 shadow-sm mb-12">
-        
+
         <!-- Cabecera -->
         <div class="pb-4 mb-6 border-b border-gray-100">
             <h3 class="font-black text-xl text-gray-800">
@@ -90,7 +101,7 @@ const manejarGuardado = async () => {
 
         <!-- Formulario organizado en Grid de 2 columnas -->
         <form @submit.prevent="manejarGuardado" class="space-y-4">
-            
+
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <!-- Código de barras -->
                 <BaseInput
@@ -125,7 +136,14 @@ const manejarGuardado = async () => {
                     v-model="formulario.unidad_medida"
                     :options="opcionesUnidadMedidas"
                     :error="productosStore.erroresValidacion?.unidad_medida?.[0]"
-                />
+
+
+                >
+                <template #option="{ option }">
+                        <span>{{ formatearCantidad(option.label) }}</span>
+                    </template>
+
+                </BaseSelect>
 
                 <!-- Precio Costo -->
                 <BaseMoneyInput
@@ -158,10 +176,16 @@ const manejarGuardado = async () => {
                 <BaseInput
                     label="Stock"
                     id="stock"
-                    type="text"
-                    v-model="formulario.stock"
+                    type="number"
+                    :step="formulario.unidad_medida === 'kilogramo' ? '0.01' : '1'"
+                    :min="0"
+                    v-model.number="formulario.stock"
                     :error="productosStore.erroresValidacion?.stock?.[0]"
-                    readonly
+                    @keypress="(e) => {
+                        if (formulario.unidad_medida !== 'kilogramo' && (e.key === '.' || e.key === ',')) {
+                            e.preventDefault();
+                        }
+                    }"
                 />
             </div>
 

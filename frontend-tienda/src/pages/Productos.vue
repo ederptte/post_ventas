@@ -4,11 +4,18 @@ import { useProductosStore } from "../stores/useProductos";
 import { useConfirmarStore } from "../stores/useConfirmarStore.js";
 import BaseTable from "../components/BaseTable.vue";
 import BaseButton from "../components/BaseButton.vue";
+import BaseSearch from "../components/BaseSearch.vue";
+import BaseInput from "../components/BaseInput.vue";
 import { moneda, formatearCantidad } from "../utils/formatos.js";
 import { Icon } from "@iconify/vue";
 import router from "../router/index.js";
 import { useToast } from "../stores/useToast.js";
 import BasePagination from "../components/BasePagination.vue";
+
+// Subir a git hub
+//git add .
+//git commit -m "Descripción de lo que cambiaste"
+//git push
 
 const productosStore = useProductosStore();
 const confirmarStore = useConfirmarStore();
@@ -30,6 +37,7 @@ watch(() => productosStore.textoBusqueda, (nuevoTexto) => {
 const columnas = [
     { key: "codigo_barra", label: "Código de barra" },
     { key: "nombre_producto", label: "Producto" },
+    { key: "presentacion", label: "Presentación" },
     { key: "stock", label: "Stock", align: "right" },
     { key: "precio_venta", label: "Precio venta", align: "right" },
     { key: "precio_costo", label: "Precio costo", align: "right" },
@@ -82,12 +90,15 @@ const irAEditar = (id) => {
 
         <div class="flex pb-3 justify-between items-center gap-4 border-b border-gray-100">
             <div class="w-full max-w-md">
-                <input
+                <BaseInput
+                    label="Buscar producto"
+                    id="buscar_producto"
                     type="text"
                     v-model="productosStore.textoBusqueda"
                     placeholder="Escribe para buscar productos en tiempo real..."
-                    class="border p-2 rounded w-full focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    :clearable="true"
                 />
+
             </div>
             <BaseButton
                 variante="primario"
@@ -118,6 +129,12 @@ const irAEditar = (id) => {
             </template>
 
             <template #cell-nombre_producto="{ value }">
+                <span class="font-semibold capitalize text-gray-800">
+                    {{ value }}
+                </span>
+            </template>
+
+            <template #cell-presentacion="{ value }">
                 <span class="font-semibold capitalize text-gray-800">
                     {{ value }}
                 </span>
@@ -192,8 +209,8 @@ const irAEditar = (id) => {
 
         <div class="shrink-0 border-t border-gray-200 pt-3">
             <BasePagination
-                :model-value="productosStore.paginaActual"
-                :total="productosStore.totalPaginas"
+                v-model="productosStore.paginaActual"
+                :total-pages="productosStore.totalPaginas"
                 :per-page="productosStore.porPagina"
                 @update:model-value="(nuevaPagina) => productosStore.obtenerProductos(nuevaPagina)"
             />

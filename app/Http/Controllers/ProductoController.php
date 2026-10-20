@@ -55,7 +55,7 @@ class ProductoController extends Controller
             });
         })
         ->orderByDesc('id')
-        ->paginate(10);
+        ->paginate(8);
 
         return response()->json([
             'status'      => 'success',

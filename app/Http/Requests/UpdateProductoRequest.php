@@ -34,7 +34,8 @@ class UpdateProductoRequest extends FormRequest
             'unidad_medida'     => 'sometimes|required|in:pieza,kilogramo',
             'precio_costo'      => 'sometimes|required|numeric|min:0',
             'precio_venta'      => 'sometimes|required|numeric|min:0',
-            'alerta_bajo_stock' => 'nullable|numeric|min:0', // Sincronizado con decimales si aplica
+            'alerta_bajo_stock' => 'nullable|numeric|min:0',
+            'stock'             => 'nullable|numeric|min:0',
             'activo'            => 'boolean'
         ];
     }
@@ -56,6 +57,7 @@ class UpdateProductoRequest extends FormRequest
             'precio_venta.numeric'      => 'El precio de venta debe ser un número válido.',
             'precio_venta.min'          => 'El precio de venta no puede ser menor a 0.',
             'alerta_bajo_stock.numeric' => 'La alerta de stock bajo debe ser un número válido.',
+            'stock.numeric'             => 'El stock debe ser un número válido.',
         ];
     }
 }

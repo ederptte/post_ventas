@@ -29,7 +29,8 @@ class StoreProductoRequest extends FormRequest
             'unidad_medida'     => 'required|in:pieza,kilogramo', // Limpiado el conflicto sometimes|required
             'precio_costo'      => 'required|numeric|min:0',
             'precio_venta'      => 'required|numeric|min:0|gte:precio_costo',
-            'alerta_bajo_stock' => 'nullable|numeric|min:0', // Coincidiendo por si usas decimales
+            'alerta_bajo_stock' => 'nullable|numeric|min:0',
+            'stock'             => 'nullable|numeric|min:0',
             'activo'            => 'boolean'
         ];
     }
@@ -54,6 +55,10 @@ class StoreProductoRequest extends FormRequest
             'stock.numeric'             => 'El stock inicial debe ser un número válido.',
             'stock.min'                 => 'El stock inicial no puede ser negativo.',
             'alerta_bajo_stock.numeric' => 'La alerta de stock bajo debe ser un número válido.',
+            'alerta_bajo_stock.min'     => 'La alerta de stock bajo no puede ser negativa.',
+            'stock.numeric'             => 'El stock inicial debe ser un número válido.',
+            'stock.min'                 => 'El stock inicial no puede ser negativo.',
+            'activo.boolean'            => 'El valor de activo debe ser verdadero o falso.'
         ];
     }
 }

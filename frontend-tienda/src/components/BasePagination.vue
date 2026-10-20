@@ -3,19 +3,18 @@ import { computed } from 'vue'
 import { Icon } from '@iconify/vue'
 
 const props = defineProps({
-  total: { type: Number, required: true },
+  totalPages: { type: Number, required: true },
   perPage: { type: Number, default: 10 },
 })
 
 const page = defineModel({ type: Number, default: 1 })
 
-const totalPages = computed(() => Math.max(1, Math.ceil(props.total / props.perPage)))
-const from = computed(() => (props.total === 0 ? 0 : (page.value - 1) * props.perPage + 1))
-const to = computed(() => Math.min(page.value * props.perPage, props.total))
+const from = computed(() => (props.totalPages === 0 ? 0 : (page.value - 1) * props.perPage + 1))
+const to = computed(() => Math.min(page.value * props.perPage, props.totalPages * props.perPage))
 
 // Muestra primera, última y las cercanas a la actual, con "…" en los saltos
 const pages = computed(() => {
-  const last = totalPages.value
+  const last = props.totalPages
   const base = [...new Set([1, last, page.value - 1, page.value, page.value + 1])]
     .filter((p) => p >= 1 && p <= last)
     .sort((a, b) => a - b)
@@ -29,7 +28,7 @@ const pages = computed(() => {
 })
 
 const ir = (p) => {
-  if (p >= 1 && p <= totalPages.value) page.value = p
+  if (p >= 1 && p <= props.totalPages) page.value = p
 }
 
 const botonBase =
@@ -40,11 +39,12 @@ const botonBase =
 
 <template>
   <nav
-    v-if="total > 0"
+    v-if="totalPages > 0"
     class="flex flex-col items-center justify-between gap-3 pt-4 sm:flex-row"
     aria-label="Paginación"
   >
-    <p class="text-sm text-gray-600">Mostrando {{ from }}–{{ to }} de {{ total }}</p>
+    <!-- Usamos totalPages * perPage o simplemente indicamos las páginas -->
+    <p class="text-sm text-gray-600">Mostrando {{ from }}–{{ to }} (Página {{ page }} de {{ totalPages }})</p>
 
     <div class="flex items-center gap-1">
       <button

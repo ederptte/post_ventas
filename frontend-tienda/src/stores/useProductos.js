@@ -11,7 +11,7 @@ export const useProductosStore = defineStore('productos', () => {
     const textoBusqueda = ref('');
 
     const paginaActual = ref(1);
-    const porPagina = ref(10);
+    const porPagina = ref(8);
     const totalPaginas = ref(1);
 
     const erroresValidacion = ref({});
