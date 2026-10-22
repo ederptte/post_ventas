@@ -40,13 +40,13 @@ const botonBase =
 <template>
   <nav
     v-if="totalPages > 0"
-    class="flex flex-col items-center justify-between gap-3 pt-4 sm:flex-row"
+    class="flex flex-col items-center justify-between gap-3 sm:flex-row"
     aria-label="Paginación"
   >
     <!-- Usamos totalPages * perPage o simplemente indicamos las páginas -->
     <p class="text-sm text-gray-600">Mostrando {{ from }}–{{ to }} (Página {{ page }} de {{ totalPages }})</p>
 
-    <div class="flex items-center gap-1">
+    <div class="flex items-center gap-1 h-4">
       <button
         type="button"
         aria-label="Página anterior"

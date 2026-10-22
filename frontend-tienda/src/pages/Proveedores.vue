@@ -3,6 +3,7 @@ import { onMounted, watch } from "vue";
 import { useProveedoresStore } from "../stores/useProveedores";
 import { useConfirmarStore } from "../stores/useConfirmarStore.js";
 import BaseButton from "../components/BaseButton.vue";
+import BaseInput from "../components/BaseInput.vue";
 import { Icon } from "@iconify/vue";
 import router from "../router/index.js";
 import { useToast } from "../stores/useToast.js";
@@ -22,7 +23,7 @@ let timeoutBusqueda = null;
 watch(() => proveedoresStore.textoBusqueda, () => {
     clearTimeout(timeoutBusqueda);
     timeoutBusqueda = setTimeout(async () => {
-        await proveedoresStore.obtenerProveedores(1); // Vuelve a la página 1 al buscar
+        await proveedoresStore.obtenerProveedores(1);
     }, 400);
 });
 
@@ -75,11 +76,13 @@ const ArmarPedido = (proveedor) => {
     </div>
     <div class="flex p-3 justify-between items-center gap-4 border-b border-gray-100">
       <div class="w-full max-w-md">
-        <input
+        <BaseInput
+            label="Buscar proveedor"
+            id="buscar_proveedor"
             type="text"
             v-model="proveedoresStore.textoBusqueda"
             placeholder="Escribe para buscar proveedores en tiempo real..."
-            class="border p-2 rounded w-full"
+            :clearable="true"
         />
       </div>
 
